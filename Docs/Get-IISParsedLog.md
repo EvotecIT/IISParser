@@ -12,14 +12,19 @@ schema: 2.0.0
 
 ## SYNTAX
 
-### FirstLastSkip
+### Default (Default)
 ```
-Get-IISParsedLog -FilePath <String> [-First <Int32>] [-Last <Int32>] [-Skip <Int32>] [<CommonParameters>]
+Get-IISParsedLog [-FilePath <String>] [<CommonParameters>]
 ```
 
 ### SkipLast
 ```
-Get-IISParsedLog -FilePath <String> [-SkipLast <Int32>] [<CommonParameters>]
+Get-IISParsedLog [-FilePath <String>] [-SkipLast <Int32>] [<CommonParameters>]
+```
+
+### FirstLastSkip
+```
+Get-IISParsedLog [-FilePath <String>] [-First <Int32>] [-Last <Int32>] [-Skip <Int32>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -44,7 +49,7 @@ Type: String
 Parameter Sets: (All)
 Aliases: LogPath
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
