@@ -33,8 +33,11 @@
     .NOTES
     General notes
     #>
-    [cmdletBinding()]
+    [cmdletBinding(DefaultParameterSetName = 'Default')]
     param(
+        [parameter(ParameterSetName = 'Default')]
+        [parameter(ParameterSetName = 'FirstLastSkip')]
+        [parameter(ParameterSetName = 'SkipLast')]
         [parameter(Mandatory)][alias('LogPath')][string] $FilePath,
         [parameter(ParameterSetName = 'FirstLastSkip')]
         [int] $First,
