@@ -33,7 +33,7 @@ $Configuration = @{
             # Description of the functionality provided by this module
             Description            = 'Module for parsing IIS logs'
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags                   = @('Windows', 'IIS', 'parser')
+            Tags                   = @('Windows', 'IIS', 'parser', 'Get-IISLog')
             # A URL to the main website for this project.
             ProjectUri             = 'https://github.com/EvotecIT/IISParser'
 
@@ -177,10 +177,10 @@ $Configuration = @{
             Verbose         = $false
         }
         PublishModule      = @{  # requires Enable to be on to process all of that
-            Enabled      = $false
+            Enabled      = $true
             Prerelease   = ''
             RequireForce = $false
-            GitHub       = $false
+            GitHub       = $true
         }
     }
 }
