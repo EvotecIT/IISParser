@@ -20,6 +20,8 @@
 </p>
 
 **IISParser** is a **PowerShell** module to read IIS logs. It's very fast and easy to use. This module is based on [IISLogParser](https://github.com/Kabindas/IISLogParser) library that does all the heavy lifting.
+You can read quick introduction to IISParser on [Reading IIS Logs with PowerShell](https://evotec.xyz/reading-iis-logs-with-powershell/) blog post.
+
 
 ## To install
 
