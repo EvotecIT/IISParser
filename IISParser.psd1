@@ -9,11 +9,11 @@
     DotNetFrameworkVersion = '4.7.2'
     FunctionsToExport      = 'Get-IISParsedLog'
     GUID                   = '798a1c8a-b4fd-4849-81d2-6138e39eb88b'
-    ModuleVersion          = '0.0.1'
+    ModuleVersion          = '0.0.2'
     PowerShellVersion      = '5.1'
     PrivateData            = @{
         PSData = @{
-            Tags       = @('Windows', 'IIS', 'parser')
+            Tags       = @('Windows', 'IIS', 'parser', 'Get-IISLog')
             ProjectUri = 'https://github.com/EvotecIT/IISParser'
         }
     }
