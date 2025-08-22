@@ -5,11 +5,9 @@ using Xunit;
 
 namespace IISParser.Tests;
 
-public class ParserEngineTests
-{
+public class ParserEngineTests {
     [Fact]
-    public void ParseLog_ReturnsEvents()
-    {
+    public void ParseLog_ReturnsEvents() {
         var path = Path.Combine(AppContext.BaseDirectory, "TestData", "sample.log");
         var engine = new ParserEngine(path);
         var eventsList = engine.ParseLog().ToList();

@@ -4,8 +4,7 @@ using System.IO;
 
 namespace IISParser;
 
-public class ParserEngine : IDisposable
-{
+public class ParserEngine : IDisposable {
     private string[]? _headerFields;
     private readonly Dictionary<string, string?> _dataStruct = new(StringComparer.OrdinalIgnoreCase);
     private readonly int _mbSize;
@@ -15,8 +14,7 @@ public class ParserEngine : IDisposable
     public int MaxFileRecord2Read { get; set; } = 1000000;
     public int CurrentFileRecord { get; private set; }
 
-    public ParserEngine(string filePath)
-    {
+    public ParserEngine(string filePath) {
         if (!File.Exists(filePath))
             throw new Exception("Could not find File " + filePath);
         FilePath = filePath;
@@ -25,8 +23,7 @@ public class ParserEngine : IDisposable
 
     public IEnumerable<IISLogEvent> ParseLog() => _mbSize < 50 ? QuickProcess() : LongProcess();
 
-    private IEnumerable<IISLogEvent> QuickProcess()
-    {
+    private IEnumerable<IISLogEvent> QuickProcess() {
         var events = new List<IISLogEvent>();
         foreach (var line in Utils.ReadAllLines(FilePath))
             ProcessLine(line, events);
@@ -34,17 +31,14 @@ public class ParserEngine : IDisposable
         return events;
     }
 
-    private IEnumerable<IISLogEvent> LongProcess()
-    {
+    private IEnumerable<IISLogEvent> LongProcess() {
         var events = new List<IISLogEvent>();
         MissingRecords = false;
         using var fileStream = File.Open(FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var reader = new StreamReader(fileStream);
-        while (reader.Peek() > -1)
-        {
+        while (reader.Peek() > -1) {
             ProcessLine(reader.ReadLine() ?? string.Empty, events);
-            if (events.Count > 0 && events.Count % MaxFileRecord2Read == 0)
-            {
+            if (events.Count > 0 && events.Count % MaxFileRecord2Read == 0) {
                 MissingRecords = true;
                 break;
             }
@@ -52,8 +46,7 @@ public class ParserEngine : IDisposable
         return events;
     }
 
-    private void ProcessLine(string line, List<IISLogEvent> events)
-    {
+    private void ProcessLine(string line, List<IISLogEvent> events) {
         if (line.StartsWith("#Fields:", StringComparison.OrdinalIgnoreCase))
             _headerFields = line.Replace("#Fields: ", string.Empty).Split(' ');
         if (line.StartsWith("#", StringComparison.OrdinalIgnoreCase) || _headerFields == null)
@@ -63,8 +56,7 @@ public class ParserEngine : IDisposable
         CurrentFileRecord++;
     }
 
-    private IISLogEvent NewEventObj()
-    {
+    private IISLogEvent NewEventObj() {
         var evt = new IISLogEvent();
         foreach (var kv in _dataStruct)
             evt.Fields[kv.Key] = kv.Value;
@@ -95,8 +87,7 @@ public class ParserEngine : IDisposable
     private DateTime GetEventDateTime()
         => DateTime.Parse($"{GetValue("date")} {GetValue("time")}");
 
-    private void FillDataStruct(string[] fieldsData, string[] header)
-    {
+    private void FillDataStruct(string[] fieldsData, string[] header) {
         _dataStruct.Clear();
         for (int i = 0; i < header.Length; i++)
             _dataStruct[header[i]] = fieldsData[i] == "-" ? null : fieldsData[i];

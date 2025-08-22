@@ -3,8 +3,7 @@ using System.Collections.Generic;
 
 namespace IISParser;
 
-public class IISLogEvent
-{
+public class IISLogEvent {
     public DateTime DateTimeEvent { get; set; }
     public string? sSitename { get; set; }
     public string? sComputername { get; set; }
