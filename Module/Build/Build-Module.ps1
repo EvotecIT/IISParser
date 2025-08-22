@@ -20,7 +20,7 @@ Build-Module -ModuleName 'IISParser' {
         # Description of the functionality provided by this module
         Description          = 'Module for parsing IIS logs'
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags                 = @('Windows', 'IIS', 'parser', 'Get-IISLog')
+        Tags                 = @('Windows', 'IIS', 'parser', 'Log Parser')
         # A URL to the main website for this project.
         ProjectUri           = 'https://github.com/EvotecIT/IISParser'
     }
