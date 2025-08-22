@@ -1,6 +1,6 @@
-$assemblyPath = Join-Path $PSScriptRoot '..' '..' 'src' 'IISParser.PowerShell' 'bin' 'Debug' 'net8.0' 'IISParser.PowerShell.dll'
+$assemblyPath = (Resolve-Path "$PSScriptRoot/../../IISParser.PowerShell/bin/Debug/net8.0/IISParser.PowerShell.dll").Path
 Import-Module $assemblyPath
-$logPath = Join-Path $PSScriptRoot '..' '..' 'tests' 'IISParser.Tests' 'TestData' 'sample.log'
+$logPath = (Resolve-Path "$PSScriptRoot/../../IISParser.Tests/TestData/sample.log").Path
 Describe 'Get-IISParsedLog' {
     It 'parses log file' {
         $result = Get-IISParsedLog -FilePath $logPath
