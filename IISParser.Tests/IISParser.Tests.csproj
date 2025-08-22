@@ -13,5 +13,6 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <None Update="TestData/sample.log" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="TestData/large_values.log" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
