@@ -12,7 +12,7 @@ public class ParserEngine : IDisposable {
     private readonly Dictionary<string, string?> _dataStruct = new(StringComparer.OrdinalIgnoreCase);
     private readonly int _mbSize;
 
-    private static readonly string[] KnownFields = {
+    private static readonly HashSet<string> KnownFields = new(StringComparer.OrdinalIgnoreCase) {
         "date",
         "time",
         "s-sitename",
@@ -110,8 +110,10 @@ public class ParserEngine : IDisposable {
 
     private IISLogEvent NewEventObj() {
         var evt = new IISLogEvent();
-        foreach (var kv in _dataStruct)
-            evt.Fields[kv.Key] = kv.Value;
+        foreach (var kv in _dataStruct) {
+            if (!KnownFields.Contains(kv.Key))
+                evt.Fields[kv.Key] = kv.Value;
+        }
         evt.DateTimeEvent = GetEventDateTime();
         evt.sSitename = GetValue("s-sitename");
         evt.sComputername = GetValue("s-computername");
@@ -133,8 +135,6 @@ public class ParserEngine : IDisposable {
         evt.scBytes = GetLong("sc-bytes");
         evt.csBytes = GetLong("cs-bytes");
         evt.timeTaken = GetLong("time-taken");
-        foreach (var field in KnownFields)
-            evt.Fields.Remove(field);
         return evt;
     }
 
