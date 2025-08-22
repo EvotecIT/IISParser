@@ -100,17 +100,17 @@ public class IISLogEvent {
     /// <summary>
     /// Gets or sets the number of bytes sent (<c>sc-bytes</c>).
     /// </summary>
-    public int? scBytes { get; set; }
+    public long? scBytes { get; set; }
 
     /// <summary>
     /// Gets or sets the number of bytes received (<c>cs-bytes</c>).
     /// </summary>
-    public int? csBytes { get; set; }
+    public long? csBytes { get; set; }
 
     /// <summary>
     /// Gets or sets the time taken to service the request, in milliseconds (<c>time-taken</c>).
     /// </summary>
-    public int? timeTaken { get; set; }
+    public long? timeTaken { get; set; }
 
     /// <summary>
     /// Gets a dictionary containing all fields from the log line keyed by their original names.

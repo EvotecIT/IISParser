@@ -105,9 +105,9 @@ public class ParserEngine : IDisposable {
         evt.scStatus = GetInt("sc-status");
         evt.scSubstatus = GetInt("sc-substatus");
         evt.scWin32Status = GetLong("sc-win32-status");
-        evt.scBytes = GetInt("sc-bytes");
-        evt.csBytes = GetInt("cs-bytes");
-        evt.timeTaken = GetInt("time-taken");
+        evt.scBytes = GetLong("sc-bytes");
+        evt.csBytes = GetLong("cs-bytes");
+        evt.timeTaken = GetLong("time-taken");
         return evt;
     }
 
