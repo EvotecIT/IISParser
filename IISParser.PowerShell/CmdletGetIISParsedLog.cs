@@ -57,6 +57,7 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
     [Parameter(ParameterSetName = "SkipLast")]
     public int? SkipLast { get; set; }
 
+    /// <inheritdoc />
     protected override Task BeginProcessingAsync() {
         ActionPreference pref = GetErrorActionPreference();
         if (EnsureFileExists(FilePath, pref)) {
@@ -65,6 +66,7 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     protected override Task ProcessRecordAsync() {
         if (_parser == null) {
             return Task.CompletedTask;
@@ -94,6 +96,7 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     protected override Task EndProcessingAsync() {
         _parser?.Dispose();
         return Task.CompletedTask;

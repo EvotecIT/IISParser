@@ -1,5 +1,3 @@
-#Import-Module "C:\Support\GitHub\PSPublishModule\PSPublishModule.psd1" -Force
-
 Build-Module -ModuleName 'IISParser' {
     # Usual defaults as per standard module
     $Manifest = [ordered] @{
@@ -10,7 +8,7 @@ Build-Module -ModuleName 'IISParser' {
         # ID used to uniquely identify this module
         GUID                 = '798a1c8a-b4fd-4849-81d2-6138e39eb88b'
         # Version number of this module.
-        ModuleVersion        = '0.0.X'
+        ModuleVersion        = '1.0.0'
         # Author of this module
         Author               = 'Przemyslaw Klys'
         # Company or vendor of this module
@@ -20,7 +18,7 @@ Build-Module -ModuleName 'IISParser' {
         # Description of the functionality provided by this module
         Description          = 'Module for parsing IIS logs'
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags                 = @('Windows', 'IIS', 'parser', 'Get-IISLog')
+        Tags                 = @('Windows', 'IIS', 'parser', 'LogParser')
         # A URL to the main website for this project.
         ProjectUri           = 'https://github.com/EvotecIT/IISParser'
     }
