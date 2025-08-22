@@ -10,7 +10,7 @@ Build-Module -ModuleName 'IISParser' {
         # ID used to uniquely identify this module
         GUID                 = '798a1c8a-b4fd-4849-81d2-6138e39eb88b'
         # Version number of this module.
-        ModuleVersion        = '0.0.X'
+        ModuleVersion        = '1.0.0'
         # Author of this module
         Author               = 'Przemyslaw Klys'
         # Company or vendor of this module
