@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IISParser", "IISParser\IISParser.csproj", "{57564EFE-51A7-434D-867C-6400E2101C80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IISParser.PowerShell", "IISParser.PowerShell\IISParser.PowerShell.csproj", "{902BC086-B5C5-4034-AE69-208C9ADA4C33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IISParser.Tests", "IISParser.Tests\IISParser.Tests.csproj", "{5A7A2093-9F4A-48DC-A884-BFEAFC01603D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{57564EFE-51A7-434D-867C-6400E2101C80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57564EFE-51A7-434D-867C-6400E2101C80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57564EFE-51A7-434D-867C-6400E2101C80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57564EFE-51A7-434D-867C-6400E2101C80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{902BC086-B5C5-4034-AE69-208C9ADA4C33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{902BC086-B5C5-4034-AE69-208C9ADA4C33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{902BC086-B5C5-4034-AE69-208C9ADA4C33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{902BC086-B5C5-4034-AE69-208C9ADA4C33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A7A2093-9F4A-48DC-A884-BFEAFC01603D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A7A2093-9F4A-48DC-A884-BFEAFC01603D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A7A2093-9F4A-48DC-A884-BFEAFC01603D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A7A2093-9F4A-48DC-A884-BFEAFC01603D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
