@@ -19,6 +19,15 @@ public class ParserEngineTests {
     }
 
     [Fact]
+    public void ParseLog_RemovesKnownFieldsFromDictionary() {
+        var path = Path.Combine(AppContext.BaseDirectory, "TestData", "sample.log");
+        var engine = new ParserEngine(path);
+        var evt = engine.ParseLog().Single();
+        Assert.False(evt.Fields.ContainsKey("cs-uri-stem"));
+        Assert.False(evt.Fields.ContainsKey("date"));
+    }
+
+    [Fact]
     public void ParseLog_HandlesValuesAboveIntMax() {
         var path = Path.Combine(AppContext.BaseDirectory, "TestData", "large_values.log");
         var engine = new ParserEngine(path);
