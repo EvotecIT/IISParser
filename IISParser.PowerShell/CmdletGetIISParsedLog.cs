@@ -57,6 +57,10 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
     [Parameter(ParameterSetName = "SkipLast")]
     public int? SkipLast { get; set; }
 
+    /// <summary>Expands fields into top-level properties.</summary>
+    [Parameter]
+    public SwitchParameter Expand { get; set; }
+
     /// <inheritdoc />
     protected override Task BeginProcessingAsync() {
         ActionPreference pref = GetErrorActionPreference();
@@ -82,17 +86,21 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
             list = list.Take(Math.Max(0, list.Count - SkipLast.Value)).ToList();
         }
 
-        var output = new List<PSObject>();
-        foreach (var evt in list) {
-            var psObj = PSObject.AsPSObject(evt);
-            foreach (var kv in evt.Fields) {
-                if (psObj.Properties[kv.Key] == null) {
-                    psObj.Properties.Add(new PSNoteProperty(kv.Key, kv.Value));
+        if (Expand) {
+            var output = new List<PSObject>();
+            foreach (var evt in list) {
+                var psObj = PSObject.AsPSObject(evt);
+                foreach (var kv in evt.Fields) {
+                    if (psObj.Properties[kv.Key] == null) {
+                        psObj.Properties.Add(new PSNoteProperty(kv.Key, kv.Value));
+                    }
                 }
+                output.Add(psObj);
             }
-            output.Add(psObj);
+            WriteObject(output, true);
+        } else {
+            WriteObject(list, true);
         }
-        WriteObject(output, true);
         return Task.CompletedTask;
     }
 
