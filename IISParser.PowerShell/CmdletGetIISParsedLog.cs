@@ -77,31 +77,77 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
         }
 
         IEnumerable<IISLogEvent> events = _parser.ParseLog();
-        var list = events.ToList();
+
         if (ParameterSetName == "FirstLastSkip") {
-            if (Skip.HasValue) list = list.Skip(Skip.Value).ToList();
-            if (First.HasValue) list = list.Take(First.Value).ToList();
-            if (Last.HasValue) list = list.Skip(Math.Max(0, list.Count - Last.Value)).ToList();
+            int skip = Skip ?? 0;
+            int remaining = First ?? int.MaxValue;
+
+            if (Last.HasValue && Last.Value > 0) {
+                int last = Last.Value;
+                var buffer = new Queue<IISLogEvent>(last);
+                foreach (var evt in events) {
+                    if (skip > 0) {
+                        skip--;
+                        continue;
+                    }
+                    if (remaining <= 0) {
+                        break;
+                    }
+
+                    if (buffer.Count == last) {
+                        buffer.Dequeue();
+                    }
+                    buffer.Enqueue(evt);
+                    remaining--;
+                }
+
+                foreach (var evt in buffer) {
+                    WriteEvent(evt);
+                }
+            } else {
+                foreach (var evt in events) {
+                    if (skip > 0) {
+                        skip--;
+                        continue;
+                    }
+                    if (remaining <= 0) {
+                        break;
+                    }
+
+                    WriteEvent(evt);
+                    remaining--;
+                }
+            }
         } else if (ParameterSetName == "SkipLast" && SkipLast.HasValue) {
-            list = list.Take(Math.Max(0, list.Count - SkipLast.Value)).ToList();
+            int skipLast = SkipLast.Value;
+            var buffer = new Queue<IISLogEvent>(skipLast);
+            foreach (var evt in events) {
+                buffer.Enqueue(evt);
+                if (buffer.Count > skipLast) {
+                    WriteEvent(buffer.Dequeue());
+                }
+            }
+        } else {
+            foreach (var evt in events) {
+                WriteEvent(evt);
+            }
         }
 
-        if (Expand) {
-            var output = new List<PSObject>();
-            foreach (var evt in list) {
-                var psObj = PSObject.AsPSObject(evt);
-                foreach (var kv in evt.Fields) {
-                    if (psObj.Properties[kv.Key] == null) {
-                        psObj.Properties.Add(new PSNoteProperty(kv.Key, kv.Value));
-                    }
-                }
-                output.Add(psObj);
-            }
-            WriteObject(output, true);
-        } else {
-            WriteObject(list, true);
-        }
         return Task.CompletedTask;
+    }
+
+    private void WriteEvent(IISLogEvent evt) {
+        if (Expand) {
+            var psObj = PSObject.AsPSObject(evt);
+            foreach (var kv in evt.Fields) {
+                if (psObj.Properties[kv.Key] == null) {
+                    psObj.Properties.Add(new PSNoteProperty(kv.Key, kv.Value));
+                }
+            }
+            WriteObject(psObj);
+        } else {
+            WriteObject(evt);
+        }
     }
 
     /// <inheritdoc />
