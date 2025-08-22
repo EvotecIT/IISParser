@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace IISParser;
 
+/// <summary>Represents a single record from an IIS log file.</summary>
+/// <para>Properties map to standard IIS log fields; additional fields are stored in the <see cref="Fields"/> dictionary.</para>
 public class IISLogEvent {
     public DateTime DateTimeEvent { get; set; }
     public string? sSitename { get; set; }

@@ -7,6 +7,16 @@ using System.IO;
 
 namespace IISParser.PowerShell;
 
+/// <summary>Provides asynchronous execution support for cmdlets.</summary>
+/// <para>Derived classes override asynchronous lifecycle methods to interact with the PowerShell pipeline without blocking.</para>
+/// <list type="alertSet">
+/// <item>
+/// <term>Note</term>
+/// <description>Override <c>BeginProcessingAsync</c>, <c>ProcessRecordAsync</c>, and <c>EndProcessingAsync</c> instead of their synchronous counterparts.</description>
+/// </item>
+/// </list>
+/// <seealso href="https://learn.microsoft.com/powershell/developer/cmdlet/cmdlet-overview" />
+/// <seealso href="https://github.com/EvotecIT/IISParser" />
 public abstract class AsyncPSCmdlet : PSCmdlet, IDisposable {
     private readonly CancellationTokenSource _cancelSource = new();
 
