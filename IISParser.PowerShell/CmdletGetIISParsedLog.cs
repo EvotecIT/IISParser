@@ -7,28 +7,47 @@ using System.Threading.Tasks;
 
 namespace IISParser.PowerShell;
 
+/// <summary>
+/// PowerShell cmdlet that parses an IIS log file and returns the parsed entries.
+/// </summary>
 [Cmdlet(VerbsCommon.Get, "IISParsedLog", DefaultParameterSetName = "Default")]
 public class CmdletGetIISParsedLog : AsyncPSCmdlet {
     private ParserEngine? _parser;
 
+    /// <summary>
+    /// Gets or sets the path to the IIS log file.
+    /// </summary>
     [Parameter(Mandatory = true, ParameterSetName = "Default")]
     [Parameter(Mandatory = true, ParameterSetName = "FirstLastSkip")]
     [Parameter(Mandatory = true, ParameterSetName = "SkipLast")]
     [Alias("LogPath")]
     public string FilePath { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Gets or sets the number of records to take from the start of the log.
+    /// </summary>
     [Parameter(ParameterSetName = "FirstLastSkip")]
     public int? First { get; set; }
 
+    /// <summary>
+    /// Gets or sets the number of records to take from the end of the log.
+    /// </summary>
     [Parameter(ParameterSetName = "FirstLastSkip")]
     public int? Last { get; set; }
 
+    /// <summary>
+    /// Gets or sets the number of records to skip from the start of the log.
+    /// </summary>
     [Parameter(ParameterSetName = "FirstLastSkip")]
     public int? Skip { get; set; }
 
+    /// <summary>
+    /// Gets or sets the number of records to skip from the end of the log.
+    /// </summary>
     [Parameter(ParameterSetName = "SkipLast")]
     public int? SkipLast { get; set; }
 
+    /// <inheritdoc />
     protected override Task BeginProcessingAsync() {
         ActionPreference pref = GetErrorActionPreference();
         if (EnsureFileExists(FilePath, pref)) {
@@ -37,6 +56,7 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     protected override Task ProcessRecordAsync() {
         if (_parser == null) {
             return Task.CompletedTask;
@@ -66,6 +86,7 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     protected override Task EndProcessingAsync() {
         _parser?.Dispose();
         return Task.CompletedTask;

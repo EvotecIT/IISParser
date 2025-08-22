@@ -4,16 +4,39 @@ using System.IO;
 
 namespace IISParser;
 
+/// <summary>
+/// Parses IIS log files and exposes the entries as <see cref="IISLogEvent"/> objects.
+/// </summary>
 public class ParserEngine : IDisposable {
     private string[]? _headerFields;
     private readonly Dictionary<string, string?> _dataStruct = new(StringComparer.OrdinalIgnoreCase);
     private readonly int _mbSize;
 
+    /// <summary>
+    /// Gets the path to the log file being processed.
+    /// </summary>
     public string FilePath { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether the parser could not read all records from the file.
+    /// </summary>
     public bool MissingRecords { get; private set; } = true;
+
+    /// <summary>
+    /// Gets or sets the maximum number of records to read before stopping.
+    /// </summary>
     public int MaxFileRecord2Read { get; set; } = 1000000;
+
+    /// <summary>
+    /// Gets the number of records processed so far.
+    /// </summary>
     public int CurrentFileRecord { get; private set; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ParserEngine"/> class for the specified file.
+    /// </summary>
+    /// <param name="filePath">The path to the IIS log file.</param>
+    /// <exception cref="Exception">Thrown when the file does not exist.</exception>
     public ParserEngine(string filePath) {
         if (!File.Exists(filePath))
             throw new Exception("Could not find File " + filePath);
@@ -21,6 +44,10 @@ public class ParserEngine : IDisposable {
         _mbSize = (int)(new FileInfo(filePath).Length / 1024 / 1024);
     }
 
+    /// <summary>
+    /// Parses the log file and returns the entries as an enumerable sequence.
+    /// </summary>
+    /// <returns>A sequence of <see cref="IISLogEvent"/> instances.</returns>
     public IEnumerable<IISLogEvent> ParseLog() => _mbSize < 50 ? QuickProcess() : LongProcess();
 
     private IEnumerable<IISLogEvent> QuickProcess() {
@@ -97,5 +124,6 @@ public class ParserEngine : IDisposable {
     private int? GetInt(string key) => int.TryParse(GetValue(key), out var v) ? v : null;
     private long? GetLong(string key) => long.TryParse(GetValue(key), out var v) ? v : null;
 
+    /// <inheritdoc />
     public void Dispose() { }
 }
