@@ -3,7 +3,7 @@ name: Test PowerShell
 on:
     push:
         branches:
-            - main
+            - master
         paths-ignore:
             - '*.md'
             - 'Docs/**'
@@ -11,7 +11,7 @@ on:
             - '.gitignore'
     pull_request:
         branches:
-            - main
+            - master
     workflow_dispatch:
 
 env:
