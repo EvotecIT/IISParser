@@ -1,12 +1,45 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net472;net8.0</TargetFrameworks>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="../IISParser/IISParser.csproj" />
-    <PackageReference Include="PowerShellStandard.Library" Version="5.1.0" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFrameworks Condition=" '$([MSBuild]::IsOsPlatform(`Windows`))' ">
+            net472;net8.0
+        </TargetFrameworks>
+        <TargetFrameworks
+            Condition=" '$([MSBuild]::IsOsPlatform(`OSX`))'  Or '$([MSBuild]::IsOsPlatform(`Linux`))' ">
+            net8.0
+        </TargetFrameworks>
+        <Title>IISParser PowerShell Module</Title>
+        <Description>PowerShell module for IISParser library. Provides cmdlets for DNS queries,
+            service discovery, zone transfers, and DNS updates.</Description>
+        <AssemblyName>IISParser.PowerShell</AssemblyName>
+        <AssemblyTitle>IISParser PowerShell Module</AssemblyTitle>
+        <VersionPrefix>1.0.0</VersionPrefix>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+        <Company>Evotec</Company>
+        <Authors>Przemyslaw Klys</Authors>
+        <Copyright>(c) 2011 - 2025 Przemyslaw Klys @ Evotec. All rights reserved.</Copyright>
+        <LangVersion>Latest</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="../IISParser/IISParser.csproj" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <!-- This is needed for XmlDoc2CmdletDoc to generate a PowerShell documentation file. -->
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MatejKafka.XmlDoc2CmdletDoc" Version="0.6.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" PrivateAssets="all" />
+    </ItemGroup>
+
 </Project>

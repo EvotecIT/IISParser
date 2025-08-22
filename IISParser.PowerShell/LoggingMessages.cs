@@ -1,4 +1,4 @@
-namespace ADPlayground.PowerShell;
+namespace IISParser.PowerShell;
 
 internal static class LoggingMessages {
     internal static class Logger {

@@ -1,8 +1,6 @@
-$assemblyPath = (Resolve-Path "$PSScriptRoot/../../IISParser.PowerShell/bin/Debug/net8.0/IISParser.PowerShell.dll").Path
-Import-Module $assemblyPath
-$logPath = (Resolve-Path "$PSScriptRoot/../../IISParser.Tests/TestData/sample.log").Path
 Describe 'Get-IISParsedLog' {
     It 'parses log file' {
+        $logPath = (Resolve-Path "$PSScriptRoot/../../IISParser.Tests/TestData/sample.log").Path
         $result = Get-IISParsedLog -FilePath $logPath
         $result.csUriStem | Should -Be '/index.html'
         $result.scStatus | Should -Be 200

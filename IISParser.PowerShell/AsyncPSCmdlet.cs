@@ -3,8 +3,9 @@ using System.Collections.Concurrent;
 using System.Management.Automation;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
-namespace ADPlayground.PowerShell;
+namespace IISParser.PowerShell;
 
 public abstract class AsyncPSCmdlet : PSCmdlet, IDisposable {
     private readonly CancellationTokenSource _cancelSource = new();
