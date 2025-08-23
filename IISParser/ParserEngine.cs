@@ -6,7 +6,7 @@ using System.Globalization;
 namespace IISParser;
 
 /// <summary>
-/// Parses IIS log files and exposes the entries as <see cref="IISLogEvent"/> objects.
+/// Parses IIS log files and exposes the entries as <see cref="IISLogRecord"/> objects.
 /// </summary>
 public class ParserEngine : IDisposable {
     private string[]? _headerFields;
@@ -71,45 +71,51 @@ public class ParserEngine : IDisposable {
     }
 
     /// <summary>
-    /// Parses the log file and returns the entries as an enumerable sequence.
+    /// Parses the log file and returns the entries as an enumerable sequence of <see cref="IISLogRecord"/>.
+    /// </summary>
+    /// <returns>A sequence of <see cref="IISLogRecord"/> instances.</returns>
+    public IEnumerable<IISLogRecord> ParseLog() => _mbSize < 50 ? QuickProcess(NewRecordObj) : LongProcess(NewRecordObj);
+
+    /// <summary>
+    /// Parses the log file and returns legacy <see cref="IISLogEvent"/> instances.
     /// </summary>
     /// <returns>A sequence of <see cref="IISLogEvent"/> instances.</returns>
-    public IEnumerable<IISLogEvent> ParseLog() => _mbSize < 50 ? QuickProcess() : LongProcess();
+    public IEnumerable<IISLogEvent> ParseLogLegacy() => _mbSize < 50 ? QuickProcess(NewEventObj) : LongProcess(NewEventObj);
 
-    private IEnumerable<IISLogEvent> QuickProcess() {
+    private IEnumerable<T> QuickProcess<T>(Func<T> factory) {
         MissingRecords = false;
         foreach (var line in Utils.ReadAllLines(FilePath)) {
-            var evt = ProcessLine(line);
-            if (evt != null)
-                yield return evt;
+            var obj = ProcessLine(line, factory);
+            if (obj != null)
+                yield return obj;
         }
     }
 
-    private IEnumerable<IISLogEvent> LongProcess() {
+    private IEnumerable<T> LongProcess<T>(Func<T> factory) {
         MissingRecords = false;
         using var fileStream = File.Open(FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var reader = new StreamReader(fileStream);
         while (reader.Peek() > -1) {
-            var evt = ProcessLine(reader.ReadLine() ?? string.Empty);
-            if (evt != null) {
+            var obj = ProcessLine(reader.ReadLine() ?? string.Empty, factory);
+            if (obj != null) {
                 if (CurrentFileRecord % MaxFileRecord2Read == 0 && reader.Peek() > -1) {
                     MissingRecords = true;
-                    yield return evt;
+                    yield return obj;
                     yield break;
                 }
-                yield return evt;
+                yield return obj;
             }
         }
     }
 
-    private IISLogEvent? ProcessLine(string line) {
+    private T? ProcessLine<T>(string line, Func<T> factory) {
         if (line.StartsWith("#Fields:", StringComparison.OrdinalIgnoreCase))
             _headerFields = line.Replace("#Fields: ", string.Empty).Split(' ');
         if (line.StartsWith("#", StringComparison.OrdinalIgnoreCase) || _headerFields == null)
-            return null;
+            return default;
         FillDataStruct(line.Split(' '), _headerFields);
         CurrentFileRecord++;
-        return NewEventObj();
+        return factory();
     }
 
     private IISLogEvent NewEventObj() {
@@ -140,6 +146,36 @@ public class ParserEngine : IDisposable {
         evt.csBytes = GetLong("cs-bytes");
         evt.timeTaken = GetLong("time-taken");
         return evt;
+    }
+
+    private IISLogRecord NewRecordObj() {
+        var record = new IISLogRecord();
+        foreach (var kv in _dataStruct) {
+            if (!KnownFields.Contains(kv.Key))
+                record.Fields[kv.Key] = kv.Value;
+        }
+        record.Timestamp = GetEventDateTime();
+        record.SiteName = GetValue("s-sitename");
+        record.ComputerName = GetValue("s-computername");
+        record.ServerIp = GetValue("s-ip");
+        record.HttpMethod = GetValue("cs-method");
+        record.UriPath = GetValue("cs-uri-stem");
+        record.UriQuery = GetValue("cs-uri-query");
+        record.ServerPort = GetInt("s-port");
+        record.Username = GetValue("cs-username");
+        record.ClientIp = GetValue("c-ip");
+        record.HttpVersion = GetValue("cs-version");
+        record.UserAgent = GetValue("cs(User-Agent)");
+        record.Cookie = GetValue("cs(Cookie)");
+        record.Referer = GetValue("cs(Referer)");
+        record.Host = GetValue("cs-host");
+        record.StatusCode = GetInt("sc-status");
+        record.SubStatusCode = GetInt("sc-substatus");
+        record.Win32Status = GetLong("sc-win32-status");
+        record.BytesSent = GetLong("sc-bytes");
+        record.BytesReceived = GetLong("cs-bytes");
+        record.TimeTakenMs = GetLong("time-taken");
+        return record;
     }
 
     private DateTime GetEventDateTime() {
