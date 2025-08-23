@@ -53,6 +53,16 @@ public class ParserEngineTests {
     }
 
     [Fact]
+    public void ParseLog_YieldsEventsLazily() {
+        var path = Path.Combine(AppContext.BaseDirectory, "TestData", "multi.log");
+        var engine = new ParserEngine(path);
+        using var enumerator = engine.ParseLog().GetEnumerator();
+        Assert.True(enumerator.MoveNext());
+        Assert.Equal("/index0.html", enumerator.Current.csUriStem);
+        Assert.Equal(1, engine.CurrentFileRecord);
+    }  
+    
+    [Fact]
     public void ParseLog_HandlesShortLogLineGracefully() {
         var path = Path.Combine(AppContext.BaseDirectory, "TestData", "short_line.log");
         var engine = new ParserEngine(path);

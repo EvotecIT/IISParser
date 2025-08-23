@@ -15,5 +15,6 @@
         <None Update="TestData/sample.log" CopyToOutputDirectory="PreserveNewest" />
         <None Update="TestData/large_values.log" CopyToOutputDirectory="PreserveNewest" />
         <None Update="TestData/short_line.log" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="TestData/multi.log" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 </Project>

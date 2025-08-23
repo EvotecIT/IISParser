@@ -1,0 +1,4 @@
+#Fields: date time s-ip cs-method cs-uri-stem sc-status
+2024-01-01 00:00:00 127.0.0.1 GET /index0.html 200
+2024-01-01 00:00:01 127.0.0.1 GET /index1.html 200
+2024-01-01 00:00:02 127.0.0.1 GET /index2.html 200

@@ -1,7 +1,6 @@
 using IISParser;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Management.Automation;
 using System.Threading.Tasks;
 
@@ -9,13 +8,8 @@ namespace IISParser.PowerShell;
 
 /// <summary>Parses entries from an IIS log file.</summary>
 /// <para>Reads the specified log and converts each record into a PowerShell object for further processing.</para>
+/// <para>Entries are streamed lazily to minimize memory usage.</para>
 /// <para>Use filtering parameters to limit the number of events returned.</para>
-/// <list type="alertSet">
-/// <item>
-/// <term>Note</term>
-/// <description>The cmdlet loads the entire log into memory before applying filters, which may impact large files.</description>
-/// </item>
-/// </list>
 /// <example>
 /// <summary>Parse an entire log file.</summary>
 /// <prefix>PS&gt; </prefix>
