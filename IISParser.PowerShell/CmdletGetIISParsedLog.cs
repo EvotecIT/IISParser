@@ -1,6 +1,7 @@
 using IISParser;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Management.Automation;
 using System.Threading.Tasks;
 
@@ -73,58 +74,23 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
         IEnumerable<IISLogEvent> events = _parser.ParseLog();
 
         if (ParameterSetName == "FirstLastSkip") {
-            int skip = Skip ?? 0;
-            int remaining = First ?? int.MaxValue;
+            if (Skip.HasValue && Skip.Value > 0) {
+                events = events.Skip(Skip.Value);
+            }
+
+            if (First.HasValue) {
+                events = events.Take(First.Value);
+            }
 
             if (Last.HasValue && Last.Value > 0) {
-                int last = Last.Value;
-                var buffer = new Queue<IISLogEvent>(last);
-                foreach (var evt in events) {
-                    if (skip > 0) {
-                        skip--;
-                        continue;
-                    }
-                    if (remaining <= 0) {
-                        break;
-                    }
-
-                    if (buffer.Count == last) {
-                        buffer.Dequeue();
-                    }
-                    buffer.Enqueue(evt);
-                    remaining--;
-                }
-
-                foreach (var evt in buffer) {
-                    WriteEvent(evt);
-                }
-            } else {
-                foreach (var evt in events) {
-                    if (skip > 0) {
-                        skip--;
-                        continue;
-                    }
-                    if (remaining <= 0) {
-                        break;
-                    }
-
-                    WriteEvent(evt);
-                    remaining--;
-                }
+                events = events.TakeLastLazy(Last.Value);
             }
-        } else if (ParameterSetName == "SkipLast" && SkipLast.HasValue) {
-            int skipLast = SkipLast.Value;
-            var buffer = new Queue<IISLogEvent>(skipLast);
-            foreach (var evt in events) {
-                buffer.Enqueue(evt);
-                if (buffer.Count > skipLast) {
-                    WriteEvent(buffer.Dequeue());
-                }
-            }
-        } else {
-            foreach (var evt in events) {
-                WriteEvent(evt);
-            }
+        } else if (ParameterSetName == "SkipLast" && SkipLast.HasValue && SkipLast.Value > 0) {
+            events = events.SkipLastLazy(SkipLast.Value);
+        }
+
+        foreach (var evt in events) {
+            WriteEvent(evt);
         }
 
         return Task.CompletedTask;
