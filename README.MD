@@ -17,7 +17,7 @@ This project is inspired by the discontinued [IISLogParser](https://github.com/K
 [![license](https://img.shields.io/github/license/EvotecIT/IISParser.svg)](https://github.com/EvotecIT/IISParser)
 [![build status](https://github.com/EvotecIT/IISParser/actions/workflows/test-dotnet.yml/badge.svg)](https://github.com/EvotecIT/IISParser/actions)
 [![build status](https://github.com/EvotecIT/IISParser/actions/workflows/test-powershell.yml/badge.svg)](https://github.com/EvotecIT/IISParser/actions)
-[![codecov](https://codecov.io/gh/EvotecIT/IISParser/branch/main/graph/badge.svg)](https://codecov.io/gh/EvotecIT/IISParser)
+[![codecov](https://codecov.io/gh/EvotecIT/IISParser/branch/master/graph/badge.svg)](https://codecov.io/gh/EvotecIT/IISParser)
 
 👨‍💻 Author & Social
 
