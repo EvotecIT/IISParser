@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Globalization;
 using Xunit;
 
 namespace IISParser.Tests;
@@ -35,5 +36,19 @@ public class ParserEngineTests {
         Assert.Equal(3000000000L, evt.scBytes);
         Assert.Equal(4000000000L, evt.csBytes);
         Assert.Equal(5000000000L, evt.timeTaken);
+    }
+
+    [Fact]
+    public void ParseLog_ParsesDateTimeUnderDifferentCulture() {
+        var originalCulture = CultureInfo.CurrentCulture;
+        try {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("fr-FR");
+            var path = Path.Combine(AppContext.BaseDirectory, "TestData", "sample.log");
+            var engine = new ParserEngine(path);
+            var evt = engine.ParseLog().Single();
+            Assert.Equal(new DateTime(2024, 1, 1, 0, 0, 0), evt.DateTimeEvent);
+        } finally {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
     }
 }
