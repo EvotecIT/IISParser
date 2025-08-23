@@ -142,8 +142,15 @@ public class ParserEngine : IDisposable {
         return evt;
     }
 
-    private DateTime GetEventDateTime()
-        => DateTime.ParseExact($"{GetValue("date")} {GetValue("time")}", "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+    private DateTime GetEventDateTime() {
+        var date = GetValue("date");
+        var time = GetValue("time");
+        if (date == null || time == null)
+            return DateTime.MinValue;
+        return DateTime.TryParseExact($"{date} {time}", "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var result)
+            ? result
+            : DateTime.MinValue;
+    }
 
     private void FillDataStruct(string[] fieldsData, string[] header) {
         _dataStruct.Clear();

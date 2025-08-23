@@ -16,5 +16,7 @@
         <None Update="TestData/large_values.log" CopyToOutputDirectory="PreserveNewest" />
         <None Update="TestData/short_line.log" CopyToOutputDirectory="PreserveNewest" />
         <None Update="TestData/multi.log" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="TestData/malformed_datetime.log" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="TestData/missing_datetime.log" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 </Project>
