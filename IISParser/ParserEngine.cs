@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Globalization;
 
 namespace IISParser;
 
@@ -139,7 +140,7 @@ public class ParserEngine : IDisposable {
     }
 
     private DateTime GetEventDateTime()
-        => DateTime.Parse($"{GetValue("date")} {GetValue("time")}");
+        => DateTime.ParseExact($"{GetValue("date")} {GetValue("time")}", "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 
     private void FillDataStruct(string[] fieldsData, string[] header) {
         _dataStruct.Clear();
