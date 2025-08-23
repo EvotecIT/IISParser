@@ -7,6 +7,7 @@
             Condition=" '$([MSBuild]::IsOsPlatform(`OSX`))'  Or '$([MSBuild]::IsOsPlatform(`Linux`))' ">
             net8.0
         </TargetFrameworks>
+        <LangVersion>Latest</LangVersion>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
