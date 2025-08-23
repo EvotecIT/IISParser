@@ -29,6 +29,12 @@ namespace IISParser.PowerShell;
 /// <code>Get-IISParsedLog -FilePath "C:\\Logs\\u_ex230101.log" -Expand</code>
 /// <para>Field names such as <c>X-Forwarded-For</c> become <c>X_Forwarded_For</c>.</para>
 /// </example>
+/// <example>
+/// <summary>Return legacy property names.</summary>
+/// <prefix>PS&gt; </prefix>
+/// <code>Get-IISParsedLog -FilePath "C:\\Logs\\u_ex230101.log" -Legacy</code>
+/// <para>Outputs entries using the original property names.</para>
+/// </example>
 /// <seealso href="https://learn.microsoft.com/iis/configuration/system.webserver/httplogging" />
 /// <seealso href="https://github.com/EvotecIT/IISParser" />
 [Cmdlet(VerbsCommon.Get, "IISParsedLog", DefaultParameterSetName = "Default")]
@@ -66,6 +72,10 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
     [Parameter]
     public SwitchParameter Expand { get; set; }
 
+    /// <summary>Outputs objects with legacy property names.</summary>
+    [Parameter]
+    public SwitchParameter Legacy { get; set; }
+
     /// <inheritdoc />
     protected override Task BeginProcessingAsync() {
         ActionPreference pref = GetErrorActionPreference();
@@ -81,28 +91,49 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
             return Task.CompletedTask;
         }
 
-        IEnumerable<IISLogEvent> events = _parser.ParseLog();
+        if (Legacy) {
+            IEnumerable<IISLogEvent> events = _parser.ParseLogLegacy();
+            if (ParameterSetName == "FirstLastSkip") {
+                if (Skip.HasValue && Skip.Value > 0) {
+                    events = events.Skip(Skip.Value);
+                }
 
-        if (ParameterSetName == "FirstLastSkip") {
-            if (Skip.HasValue && Skip.Value > 0) {
-                events = events.Skip(Skip.Value);
+                if (First.HasValue) {
+                    events = events.Take(First.Value);
+                }
+
+                if (Last.HasValue && Last.Value > 0) {
+                    events = events.TakeLastLazy(Last.Value);
+                }
+            } else if (ParameterSetName == "SkipLast" && SkipLast.HasValue && SkipLast.Value > 0) {
+                events = events.SkipLastLazy(SkipLast.Value);
             }
 
-            if (First.HasValue) {
-                events = events.Take(First.Value);
+            foreach (var evt in events) {
+                WriteEvent(evt);
+            }
+        } else {
+            IEnumerable<IISLogRecord> records = _parser.ParseLog();
+            if (ParameterSetName == "FirstLastSkip") {
+                if (Skip.HasValue && Skip.Value > 0) {
+                    records = records.Skip(Skip.Value);
+                }
+
+                if (First.HasValue) {
+                    records = records.Take(First.Value);
+                }
+
+                if (Last.HasValue && Last.Value > 0) {
+                    records = records.TakeLastLazy(Last.Value);
+                }
+            } else if (ParameterSetName == "SkipLast" && SkipLast.HasValue && SkipLast.Value > 0) {
+                records = records.SkipLastLazy(SkipLast.Value);
             }
 
-            if (Last.HasValue && Last.Value > 0) {
-                events = events.TakeLastLazy(Last.Value);
+            foreach (var record in records) {
+                WriteRecord(record);
             }
-        } else if (ParameterSetName == "SkipLast" && SkipLast.HasValue && SkipLast.Value > 0) {
-            events = events.SkipLastLazy(SkipLast.Value);
         }
-
-        foreach (var evt in events) {
-            WriteEvent(evt);
-        }
-
         return Task.CompletedTask;
     }
 
@@ -136,6 +167,26 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
             WriteObject(psObj);
         } else {
             WriteObject(evt);
+        }
+    }
+
+    private void WriteRecord(IISLogRecord record) {
+        if (Expand) {
+            var psObj = new PSObject();
+            foreach (var prop in PSObject.AsPSObject(record).Properties) {
+                if (!prop.Name.Equals("Fields", StringComparison.OrdinalIgnoreCase)) {
+                    psObj.Properties.Add(new PSNoteProperty(prop.Name, prop.Value));
+                }
+            }
+
+            foreach (var kv in record.Fields) {
+                var key = ToPsIdentifier(kv.Key);
+                psObj.Properties.Add(new PSNoteProperty(key, kv.Value));
+            }
+
+            WriteObject(psObj);
+        } else {
+            WriteObject(record);
         }
     }
 
