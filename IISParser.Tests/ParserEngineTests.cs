@@ -60,5 +60,14 @@ public class ParserEngineTests {
         Assert.True(enumerator.MoveNext());
         Assert.Equal("/index0.html", enumerator.Current.csUriStem);
         Assert.Equal(1, engine.CurrentFileRecord);
+    }  
+    
+    [Fact]
+    public void ParseLog_HandlesShortLogLineGracefully() {
+        var path = Path.Combine(AppContext.BaseDirectory, "TestData", "short_line.log");
+        var engine = new ParserEngine(path);
+        var evt = engine.ParseLog().Single();
+        Assert.True(evt.Fields.ContainsKey("X-Forwarded-For"));
+        Assert.Null(evt.Fields["X-Forwarded-For"]);
     }
 }
