@@ -70,4 +70,22 @@ public class ParserEngineTests {
         Assert.True(evt.Fields.ContainsKey("X-Forwarded-For"));
         Assert.Null(evt.Fields["X-Forwarded-For"]);
     }
+
+    [Fact]
+    public void ParseLog_MalformedDateTime_ReturnsMinValue() {
+        var path = Path.Combine(AppContext.BaseDirectory, "TestData", "malformed_datetime.log");
+        var engine = new ParserEngine(path);
+        var evt = engine.ParseLog().Single();
+        Assert.Equal(DateTime.MinValue, evt.DateTimeEvent);
+        Assert.Equal("/index.html", evt.csUriStem);
+    }
+
+    [Fact]
+    public void ParseLog_MissingDateTime_ReturnsMinValue() {
+        var path = Path.Combine(AppContext.BaseDirectory, "TestData", "missing_datetime.log");
+        var engine = new ParserEngine(path);
+        var evt = engine.ParseLog().Single();
+        Assert.Equal(DateTime.MinValue, evt.DateTimeEvent);
+        Assert.Equal("/index.html", evt.csUriStem);
+    }
 }

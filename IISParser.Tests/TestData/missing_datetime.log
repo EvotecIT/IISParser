@@ -1,0 +1,2 @@
+#Fields: date time s-ip cs-method cs-uri-stem sc-status
+- - 127.0.0.1 GET /index.html 200
