@@ -17,7 +17,7 @@ public class EnumerableExtensionsTests {
         IEnumerable<int> source = Enumerable.Range(0, 100);
         var result = source.SkipLastLazy(10).ToArray();
         Assert.Equal(90, result.Length);
-        Assert.Equal(89, result[^1]);
+        Assert.Equal(89, result[result.Length - 1]);
     }
 }
 
