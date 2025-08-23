@@ -83,10 +83,10 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
             }
 
             if (Last.HasValue && Last.Value > 0) {
-                events = events.TakeLast(Last.Value);
+                events = TakeLastLazy(events, Last.Value);
             }
         } else if (ParameterSetName == "SkipLast" && SkipLast.HasValue && SkipLast.Value > 0) {
-            events = events.SkipLast(SkipLast.Value);
+            events = SkipLastLazy(events, SkipLast.Value);
         }
 
         foreach (var evt in events) {
@@ -94,6 +94,49 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
         }
 
         return Task.CompletedTask;
+    }
+
+    private static IEnumerable<T> TakeLastLazy<T>(IEnumerable<T> source, int count) {
+        if (source == null) {
+            throw new ArgumentNullException(nameof(source));
+        }
+
+        if (count <= 0) {
+            yield break;
+        }
+
+        var queue = new Queue<T>(count);
+        foreach (var item in source) {
+            if (queue.Count == count) {
+                queue.Dequeue();
+            }
+            queue.Enqueue(item);
+        }
+
+        foreach (var item in queue) {
+            yield return item;
+        }
+    }
+
+    private static IEnumerable<T> SkipLastLazy<T>(IEnumerable<T> source, int count) {
+        if (source == null) {
+            throw new ArgumentNullException(nameof(source));
+        }
+
+        if (count <= 0) {
+            foreach (var item in source) {
+                yield return item;
+            }
+            yield break;
+        }
+
+        var queue = new Queue<T>(count + 1);
+        foreach (var item in source) {
+            queue.Enqueue(item);
+            if (queue.Count > count) {
+                yield return queue.Dequeue();
+            }
+        }
     }
 
     private void WriteEvent(IISLogEvent evt) {
