@@ -37,4 +37,16 @@ Describe 'Get-IISParsedLog' {
         $result.Count | Should -Be 990
         $result[-1].csUriStem | Should -Be '/index989.html'
     }
+
+    It 'returns last records from large log' {
+        $logPath = Join-Path $TestDrive 'large3.log'
+        $header = '#Fields: date time s-ip cs-method cs-uri-stem sc-status X-Forwarded-For'
+        $entries = 0..999 | ForEach-Object { "2024-01-01 00:00:00 127.0.0.1 GET /index$_.html 200 192.168.0.1" }
+        $header, $entries | Set-Content -Path $logPath
+
+        $result = Get-IISParsedLog -FilePath $logPath -Last 5
+        $result.Count | Should -Be 5
+        $result[0].csUriStem | Should -Be '/index995.html'
+        $result[-1].csUriStem | Should -Be '/index999.html'
+    }
 }
