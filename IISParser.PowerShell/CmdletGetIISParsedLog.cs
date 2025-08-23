@@ -138,12 +138,14 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
 
     private void WriteEvent(IISLogEvent evt) {
         if (Expand) {
-            var psObj = PSObject.AsPSObject(evt);
-            foreach (var kv in evt.Fields) {
-                if (psObj.Properties[kv.Key] == null) {
-                    psObj.Properties.Add(new PSNoteProperty(kv.Key, kv.Value));
+            var psObj = new PSObject();
+            foreach (var prop in PSObject.AsPSObject(evt).Properties) {
+                if (!prop.Name.Equals("Fields", StringComparison.OrdinalIgnoreCase)) {
+                    psObj.Properties.Add(new PSNoteProperty(prop.Name, prop.Value));
                 }
             }
+            foreach (var kv in evt.Fields)
+                psObj.Properties.Add(new PSNoteProperty(kv.Key, kv.Value));
             WriteObject(psObj);
         } else {
             WriteObject(evt);

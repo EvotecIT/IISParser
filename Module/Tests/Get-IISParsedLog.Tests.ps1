@@ -12,6 +12,7 @@ Describe 'Get-IISParsedLog' {
         $logPath = (Resolve-Path "$PSScriptRoot/../../IISParser.Tests/TestData/sample.log").Path
         $result = Get-IISParsedLog -FilePath $logPath -Expand
         $result.'X-Forwarded-For' | Should -Be '192.168.0.1'
+        ($result.PSObject.Properties.Match('Fields').Count) | Should -Be 0
     }
 
     It 'streams large log with Skip, First and Last' {

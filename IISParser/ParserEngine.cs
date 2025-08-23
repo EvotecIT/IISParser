@@ -12,6 +12,31 @@ public class ParserEngine : IDisposable {
     private readonly Dictionary<string, string?> _dataStruct = new(StringComparer.OrdinalIgnoreCase);
     private readonly int _mbSize;
 
+    private static readonly HashSet<string> KnownFields = new(StringComparer.OrdinalIgnoreCase) {
+        "date",
+        "time",
+        "s-sitename",
+        "s-computername",
+        "s-ip",
+        "cs-method",
+        "cs-uri-stem",
+        "cs-uri-query",
+        "s-port",
+        "cs-username",
+        "c-ip",
+        "cs-version",
+        "cs(User-Agent)",
+        "cs(Cookie)",
+        "cs(Referer)",
+        "cs-host",
+        "sc-status",
+        "sc-substatus",
+        "sc-win32-status",
+        "sc-bytes",
+        "cs-bytes",
+        "time-taken"
+    };
+
     /// <summary>
     /// Gets the path to the log file being processed.
     /// </summary>
@@ -85,8 +110,10 @@ public class ParserEngine : IDisposable {
 
     private IISLogEvent NewEventObj() {
         var evt = new IISLogEvent();
-        foreach (var kv in _dataStruct)
-            evt.Fields[kv.Key] = kv.Value;
+        foreach (var kv in _dataStruct) {
+            if (!KnownFields.Contains(kv.Key))
+                evt.Fields[kv.Key] = kv.Value;
+        }
         evt.DateTimeEvent = GetEventDateTime();
         evt.sSitename = GetValue("s-sitename");
         evt.sComputername = GetValue("s-computername");
