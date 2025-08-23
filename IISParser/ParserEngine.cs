@@ -77,36 +77,39 @@ public class ParserEngine : IDisposable {
     public IEnumerable<IISLogEvent> ParseLog() => _mbSize < 50 ? QuickProcess() : LongProcess();
 
     private IEnumerable<IISLogEvent> QuickProcess() {
-        var events = new List<IISLogEvent>();
-        foreach (var line in Utils.ReadAllLines(FilePath))
-            ProcessLine(line, events);
         MissingRecords = false;
-        return events;
+        foreach (var line in Utils.ReadAllLines(FilePath)) {
+            var evt = ProcessLine(line);
+            if (evt != null)
+                yield return evt;
+        }
     }
 
     private IEnumerable<IISLogEvent> LongProcess() {
-        var events = new List<IISLogEvent>();
         MissingRecords = false;
         using var fileStream = File.Open(FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var reader = new StreamReader(fileStream);
         while (reader.Peek() > -1) {
-            ProcessLine(reader.ReadLine() ?? string.Empty, events);
-            if (events.Count > 0 && events.Count % MaxFileRecord2Read == 0) {
-                MissingRecords = true;
-                break;
+            var evt = ProcessLine(reader.ReadLine() ?? string.Empty);
+            if (evt != null) {
+                if (CurrentFileRecord % MaxFileRecord2Read == 0 && reader.Peek() > -1) {
+                    MissingRecords = true;
+                    yield return evt;
+                    yield break;
+                }
+                yield return evt;
             }
         }
-        return events;
     }
 
-    private void ProcessLine(string line, List<IISLogEvent> events) {
+    private IISLogEvent? ProcessLine(string line) {
         if (line.StartsWith("#Fields:", StringComparison.OrdinalIgnoreCase))
             _headerFields = line.Replace("#Fields: ", string.Empty).Split(' ');
         if (line.StartsWith("#", StringComparison.OrdinalIgnoreCase) || _headerFields == null)
-            return;
+            return null;
         FillDataStruct(line.Split(' '), _headerFields);
-        events.Add(NewEventObj());
         CurrentFileRecord++;
+        return NewEventObj();
     }
 
     private IISLogEvent NewEventObj() {
