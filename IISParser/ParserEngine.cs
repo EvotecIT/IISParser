@@ -144,8 +144,13 @@ public class ParserEngine : IDisposable {
 
     private void FillDataStruct(string[] fieldsData, string[] header) {
         _dataStruct.Clear();
-        for (int i = 0; i < header.Length; i++)
-            _dataStruct[header[i]] = fieldsData[i] == "-" ? null : fieldsData[i];
+        for (int i = 0; i < header.Length; i++) {
+            if (i < fieldsData.Length) {
+                _dataStruct[header[i]] = fieldsData[i] == "-" ? null : fieldsData[i];
+            } else {
+                _dataStruct[header[i]] = null;
+            }
+        }
     }
 
     private string? GetValue(string key) => _dataStruct.TryGetValue(key, out var v) ? v : null;
