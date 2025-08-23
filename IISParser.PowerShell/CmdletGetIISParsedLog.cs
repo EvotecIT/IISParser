@@ -23,6 +23,12 @@ namespace IISParser.PowerShell;
 /// <code>Get-IISParsedLog -FilePath "C:\\Logs\\u_ex230101.log" -Skip 10 -First 5</code>
 /// <para>Skips the first ten lines and returns the next five.</para>
 /// </example>
+/// <example>
+/// <summary>Expand fields into PowerShell-friendly properties.</summary>
+/// <prefix>PS&gt; </prefix>
+/// <code>Get-IISParsedLog -FilePath "C:\\Logs\\u_ex230101.log" -Expand</code>
+/// <para>Field names such as <c>X-Forwarded-For</c> become <c>X_Forwarded_For</c>.</para>
+/// </example>
 /// <seealso href="https://learn.microsoft.com/iis/configuration/system.webserver/httplogging" />
 /// <seealso href="https://github.com/EvotecIT/IISParser" />
 [Cmdlet(VerbsCommon.Get, "IISParsedLog", DefaultParameterSetName = "Default")]
@@ -52,7 +58,11 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
     [Parameter(ParameterSetName = "SkipLast")]
     public int? SkipLast { get; set; }
 
-    /// <summary>Expands fields into top-level properties.</summary>
+    /// <summary>
+    /// Expands fields into top-level properties.
+    /// Field names are transformed into PowerShell-friendly identifiers by
+    /// replacing <c>-</c> with <c>_</c> and removing parentheses.
+    /// </summary>
     [Parameter]
     public SwitchParameter Expand { get; set; }
 
@@ -96,6 +106,19 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
         return Task.CompletedTask;
     }
 
+    private static string ToPsIdentifier(string key) {
+        var chars = key.ToCharArray();
+        for (int i = 0; i < chars.Length; i++) {
+            chars[i] = chars[i] switch {
+                '-' => '_',
+                '(' or ')' => '\0',
+                _ => chars[i]
+            };
+        }
+
+        return new string(chars.Where(c => c != '\0').ToArray());
+    }
+
     private void WriteEvent(IISLogEvent evt) {
         if (Expand) {
             var psObj = new PSObject();
@@ -104,8 +127,12 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
                     psObj.Properties.Add(new PSNoteProperty(prop.Name, prop.Value));
                 }
             }
-            foreach (var kv in evt.Fields)
-                psObj.Properties.Add(new PSNoteProperty(kv.Key, kv.Value));
+
+            foreach (var kv in evt.Fields) {
+                var key = ToPsIdentifier(kv.Key);
+                psObj.Properties.Add(new PSNoteProperty(key, kv.Value));
+            }
+
             WriteObject(psObj);
         } else {
             WriteObject(evt);
