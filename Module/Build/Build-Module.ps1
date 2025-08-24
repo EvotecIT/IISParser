@@ -24,7 +24,6 @@ Build-Module -ModuleName 'IISParser' {
     }
     New-ConfigurationManifest @Manifest
 
-
     $ConfigurationFormat = [ordered] @{
         RemoveComments                              = $false
 
@@ -90,13 +89,10 @@ Build-Module -ModuleName 'IISParser' {
 
     New-ConfigurationBuild @newConfigurationBuildSplat
 
-    # Copy formatting file to module output
-    # New-ConfigurationModule -Type RequiredFile -Path "$PSScriptRoot\..\..\DnsClientX.PowerShell\DnsClientX.Format.ps1xml" -Destination 'DnsClientX.Format.ps1xml'
-
     New-ConfigurationArtefact -Type Unpacked -Enable -Path "$PSScriptRoot\..\Artefacts\Unpacked" -RequiredModulesPath "$PSScriptRoot\..\Artefacts\Unpacked\Modules"
-    New-ConfigurationArtefact -Type Packed -Enable -Path "$PSScriptRoot\..\Artefacts\Packed" -IncludeTagName -ArtefactName "DnsClientX-PowerShellModule.<TagModuleVersionWithPreRelease>.zip" -ID 'ToGitHub'
+    New-ConfigurationArtefact -Type Packed -Enable -Path "$PSScriptRoot\..\Artefacts\Packed" -IncludeTagName -ArtefactName "IISParser-PowerShellModule.<TagModuleVersionWithPreRelease>.zip" -ID 'ToGitHub'
 
     # global options for publishing to github/psgallery
     #New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt' -Enabled:$true
-    #New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT' -Enabled:$true -ID 'ToGitHub' -OverwriteTagName 'DnsClientX-PowerShellModule.<TagModuleVersionWithPreRelease>'
+    #New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT' -Enabled:$true -ID 'ToGitHub' -OverwriteTagName 'IISParser-PowerShellModule.<TagModuleVersionWithPreRelease>'
 }
