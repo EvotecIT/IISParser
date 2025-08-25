@@ -25,6 +25,17 @@ Describe 'Get-IISParsedLog' {
         ($result.PSObject.Properties.Match('Fields').Count) | Should -Be 0
     }
 
+    It 'accepts relative file paths' {
+        $logPath = (Resolve-Path "$PSScriptRoot/../../IISParser.Tests/TestData/sample.log").Path
+        Push-Location (Split-Path $logPath)
+        try {
+            $result = Get-IISParsedLog -FilePath './sample.log'
+            $result.UriPath | Should -Be '/index.html'
+        } finally {
+            Pop-Location
+        }
+    }
+
     It 'streams large log with Skip, First and Last' {
         $logPath = Join-Path $TestDrive 'large.log'
         $header = '#Fields: date time s-ip cs-method cs-uri-stem sc-status X-Forwarded-For'

@@ -79,8 +79,8 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
     /// <inheritdoc />
     protected override Task BeginProcessingAsync() {
         ActionPreference pref = GetErrorActionPreference();
-        if (EnsureFileExists(FilePath, pref)) {
-            _parser = new ParserEngine(FilePath);
+        if (EnsureFileExists(FilePath, pref, out string resolvedPath)) {
+            _parser = new ParserEngine(resolvedPath);
         }
         return Task.CompletedTask;
     }
