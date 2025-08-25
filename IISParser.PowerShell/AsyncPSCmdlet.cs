@@ -253,16 +253,23 @@ public abstract class AsyncPSCmdlet : PSCmdlet, IDisposable {
     /// </summary>
     /// <param name="path">The file path to check.</param>
     /// <param name="errorAction">The action preference determining error handling.</param>
+    /// <param name="resolvedPath">The resolved provider path.</param>
     /// <returns><c>true</c> if the file exists; otherwise, <c>false</c>.</returns>
-    protected bool EnsureFileExists(string path, ActionPreference errorAction) {
-        if (File.Exists(path)) {
+    protected bool EnsureFileExists(string path, ActionPreference errorAction, out string resolvedPath) {
+        try {
+            resolvedPath = GetUnresolvedProviderPathFromPSPath(path);
+        } catch (ItemNotFoundException) {
+            resolvedPath = path;
+        }
+
+        if (File.Exists(resolvedPath)) {
             return true;
         }
 
-        string message = $"{MyInvocation.InvocationName} - The specified file does not exist: {path}";
+        string message = $"{MyInvocation.InvocationName} - The specified file does not exist: {resolvedPath}";
         if (errorAction == ActionPreference.Stop) {
-            FileNotFoundException ex = new("The specified file does not exist.", path);
-            ThrowTerminatingError(new ErrorRecord(ex, "FileNotFound", ErrorCategory.ObjectNotFound, path));
+            FileNotFoundException ex = new("The specified file does not exist.", resolvedPath);
+            ThrowTerminatingError(new ErrorRecord(ex, "FileNotFound", ErrorCategory.ObjectNotFound, resolvedPath));
         } else {
             LoggingMessages.Logger.WriteWarning(message);
         }

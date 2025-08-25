@@ -20,6 +20,20 @@ public class ParserEngineTests {
     }
 
     [Fact]
+    public void ParseLog_SupportsRelativePath() {
+        var baseDir = Path.Combine(AppContext.BaseDirectory, "TestData");
+        var previous = Environment.CurrentDirectory;
+        try {
+            Environment.CurrentDirectory = baseDir;
+            var engine = new ParserEngine("./sample.log");
+            var record = engine.ParseLog().Single();
+            Assert.Equal("/index.html", record.UriPath);
+        } finally {
+            Environment.CurrentDirectory = previous;
+        }
+    }
+
+    [Fact]
     public void ParseLog_RemovesKnownFieldsFromDictionary() {
         var path = Path.Combine(AppContext.BaseDirectory, "TestData", "sample.log");
         var engine = new ParserEngine(path);
