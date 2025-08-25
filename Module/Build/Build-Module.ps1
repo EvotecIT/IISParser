@@ -84,7 +84,7 @@ Build-Module -ModuleName 'IISParser' {
         NETFramework                      = 'net472', 'net8.0'
         DotSourceLibraries                = $true
         NETSearchClass                    = 'IISParser.PowerShell.CmdletGetIISParsedLog'
-        RefreshPSD1Only                   = $false
+        RefreshPSD1Only                   = $true
     }
 
     New-ConfigurationBuild @newConfigurationBuildSplat
@@ -93,6 +93,6 @@ Build-Module -ModuleName 'IISParser' {
     New-ConfigurationArtefact -Type Packed -Enable -Path "$PSScriptRoot\..\Artefacts\Packed" -IncludeTagName -ArtefactName "IISParser-PowerShellModule.<TagModuleVersionWithPreRelease>.zip" -ID 'ToGitHub'
 
     # global options for publishing to github/psgallery
-    New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt' -Enabled:$true
-    New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT' -Enabled:$true -ID 'ToGitHub' -OverwriteTagName 'IISParser-PowerShellModule.<TagModuleVersionWithPreRelease>'
+    #New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt' -Enabled:$true
+    #New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT' -Enabled:$true -ID 'ToGitHub' -OverwriteTagName 'IISParser-PowerShellModule.<TagModuleVersionWithPreRelease>'
 }
