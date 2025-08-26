@@ -11,6 +11,11 @@ This project is inspired by the discontinued [IISLogParser](https://github.com/K
 [![powershell gallery platforms](https://img.shields.io/powershellgallery/p/IISParser.svg)](https://www.powershellgallery.com/packages/IISParser)
 [![powershell gallery downloads](https://img.shields.io/powershellgallery/dt/IISParser.svg)](https://www.powershellgallery.com/packages/IISParser)
 
+📦 NuGet Package
+
+[![nuget version](https://img.shields.io/nuget/v/IISParser.svg)](https://www.nuget.org/packages/IISParser/)
+[![nuget downloads](https://img.shields.io/nuget/dt/IISParser.svg?label=nuget%20downloads)](https://www.nuget.org/packages/IISParser/)
+
 🛠️ Project Information
 
 [![top language](https://img.shields.io/github/languages/top/evotecit/IISParser.svg)](https://github.com/EvotecIT/IISParser)
@@ -46,7 +51,13 @@ Originally, **IISLogParser** handled IIS log parsing. After it was discontinued,
 
 ```powershell
 Install-Module -Name IISParser -Scope CurrentUser
-````
+```
+
+To use IISParser in a .NET project:
+
+```bash
+dotnet add package IISParser
+```
 
 ---
 
@@ -61,6 +72,8 @@ Update-Module -Name IISParser
 ---
 
 ## Usage Examples
+
+### PowerShell
 
 ```powershell
 Import-Module IISParser
@@ -79,6 +92,19 @@ Detailed output:
 Get-IISParsedLog -FilePath "C:\Logs\u_ex220507.log" -First 1 -Skip 1 | Format-List
 ```
 
+
+### .NET
+
+```csharp
+using IISParser;
+
+var parser = new ParserEngine("C:\\Logs\\u_ex220507.log");
+
+foreach (var record in parser.ParseLog())
+{
+    Console.WriteLine($"{record.Timestamp:o} {record.UriPath}");
+}
+```
 
 ## Credits
 
