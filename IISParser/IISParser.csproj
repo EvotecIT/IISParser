@@ -6,9 +6,9 @@
         </Description>
         <AssemblyName>IISParser</AssemblyName>
         <AssemblyTitle>IISParser</AssemblyTitle>
-        <VersionPrefix>1.0.1</VersionPrefix>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.0</FileVersion>
+        <VersionPrefix>1.0.2</VersionPrefix>
+        <AssemblyVersion>1.0.2</AssemblyVersion>
+        <FileVersion>1.0.2</FileVersion>
         <TargetFrameworks Condition=" '$([MSBuild]::IsOsPlatform(`Windows`))' ">
             net472;net8.0
         </TargetFrameworks>

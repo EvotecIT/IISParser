@@ -12,9 +12,9 @@
             service discovery, zone transfers, and DNS updates.</Description>
         <AssemblyName>IISParser.PowerShell</AssemblyName>
         <AssemblyTitle>IISParser PowerShell Module</AssemblyTitle>
-        <VersionPrefix>1.0.1</VersionPrefix>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.0</FileVersion>
+        <VersionPrefix>1.0.2</VersionPrefix>
+        <AssemblyVersion>1.0.2</AssemblyVersion>
+        <FileVersion>1.0.2</FileVersion>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
         <Company>Evotec</Company>
         <Authors>Przemyslaw Klys</Authors>
