@@ -142,6 +142,23 @@ public class ParserEngineTests {
         }
     }
 
+    [Fact]
+    public void ParseLog_StopsWhenMaxRecordLimitIsReached_ForSmallFiles() {
+        var path = CreateLargeLogFile(200, 10);
+        try {
+            var engine = new ParserEngine(path) {
+                MaxFileRecord2Read = 5
+            };
+
+            var records = engine.ParseLog().ToList();
+
+            Assert.Equal(5, records.Count);
+            Assert.True(engine.MissingRecords);
+        } finally {
+            File.Delete(path);
+        }
+    }
+
     private static string CreateLargeLogFile(int recordCount, int fillerLength) {
         var path = Path.Combine(Path.GetTempPath(), $"iisparser_{Guid.NewGuid():N}.log");
         var filler = new string('a', fillerLength);

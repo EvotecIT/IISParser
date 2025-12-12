@@ -85,10 +85,20 @@ public class ParserEngine : IDisposable {
 
     private IEnumerable<T> QuickProcess<T>(Func<T> factory) {
         MissingRecords = false;
-        foreach (var line in Utils.ReadAllLines(FilePath)) {
-            var obj = ProcessLine(line, factory);
-            if (obj != null)
+        var lines = Utils.ReadAllLines(FilePath);
+        var maxRecords = MaxFileRecord2Read <= 0 ? int.MaxValue : MaxFileRecord2Read;
+
+        for (var i = 0; i < lines.Count; i++) {
+            var obj = ProcessLine(lines[i], factory);
+            if (obj != null) {
+                if (CurrentFileRecord % maxRecords == 0 && i < lines.Count - 1) {
+                    MissingRecords = true;
+                    yield return obj;
+                    yield break;
+                }
+
                 yield return obj;
+            }
         }
     }
 
