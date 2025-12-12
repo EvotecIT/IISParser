@@ -35,6 +35,12 @@ namespace IISParser.PowerShell;
 /// <code>Get-IISParsedLog -FilePath "C:\\Logs\\u_ex230101.log" -Legacy</code>
 /// <para>Outputs entries using the original property names.</para>
 /// </example>
+/// <example>
+/// <summary>Limit the number of processed records.</summary>
+/// <prefix>PS&gt; </prefix>
+/// <code>Get-IISParsedLog -FilePath "C:\\Logs\\u_ex230101.log" -MaxRecords 50000</code>
+/// <para>Reads only the first 50,000 entries before stopping.</para>
+/// </example>
 /// <seealso href="https://learn.microsoft.com/iis/configuration/system.webserver/httplogging" />
 /// <seealso href="https://github.com/EvotecIT/IISParser" />
 [Cmdlet(VerbsCommon.Get, "IISParsedLog", DefaultParameterSetName = "Default")]
@@ -76,11 +82,21 @@ public class CmdletGetIISParsedLog : AsyncPSCmdlet {
     [Parameter]
     public SwitchParameter Legacy { get; set; }
 
+    /// <summary>
+    /// Maximum number of records to read from the log file.
+    /// The default (<c>null</c>) reads the entire file.
+    /// </summary>
+    [Parameter]
+    [ValidateRange(1, int.MaxValue)]
+    public int? MaxRecords { get; set; }
+
     /// <inheritdoc />
     protected override Task BeginProcessingAsync() {
         ActionPreference pref = GetErrorActionPreference();
         if (EnsureFileExists(FilePath, pref, out string resolvedPath)) {
-            _parser = new ParserEngine(resolvedPath);
+            _parser = new ParserEngine(resolvedPath) {
+                MaxFileRecord2Read = MaxRecords ?? int.MaxValue
+            };
         }
         return Task.CompletedTask;
     }

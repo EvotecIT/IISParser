@@ -113,4 +113,64 @@ public class ParserEngineTests {
         Assert.Equal("/index.html", evt.csUriStem);
         Assert.Equal(200, evt.scStatus);
     }
+
+    [Fact]
+    public void ParseLog_ReadsAllRecordsWhenNoLimitIsApplied() {
+        var path = CreateLargeLogFile(1200, 45000);
+        try {
+            var engine = new ParserEngine(path);
+            var records = engine.ParseLog().ToList();
+            Assert.Equal(1200, records.Count);
+            Assert.False(engine.MissingRecords);
+        } finally {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void ParseLog_StopsWhenMaxRecordLimitIsReached() {
+        var path = CreateLargeLogFile(1200, 45000);
+        try {
+            var engine = new ParserEngine(path) {
+                MaxFileRecord2Read = 10
+            };
+            var records = engine.ParseLog().ToList();
+            Assert.Equal(10, records.Count);
+            Assert.True(engine.MissingRecords);
+        } finally {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void ParseLog_StopsWhenMaxRecordLimitIsReached_ForSmallFiles() {
+        var path = CreateLargeLogFile(200, 10);
+        try {
+            var engine = new ParserEngine(path) {
+                MaxFileRecord2Read = 5
+            };
+
+            var records = engine.ParseLog().ToList();
+
+            Assert.Equal(5, records.Count);
+            Assert.True(engine.MissingRecords);
+        } finally {
+            File.Delete(path);
+        }
+    }
+
+    private static string CreateLargeLogFile(int recordCount, int fillerLength) {
+        var path = Path.Combine(Path.GetTempPath(), $"iisparser_{Guid.NewGuid():N}.log");
+        var filler = new string('a', fillerLength);
+        var line = $"2024-01-01 00:00:00 GET /{filler} - 80 - 127.0.0.1 HTTP/1.1 - - - localhost 200 0 0 123 456 789";
+
+        using var writer = new StreamWriter(path);
+        writer.WriteLine("#Software: Microsoft Internet Information Services 10.0");
+        writer.WriteLine("#Fields: date time cs-method cs-uri-stem cs-uri-query s-port cs-username c-ip cs-version cs(User-Agent) cs(Cookie) cs(Referer) cs-host sc-status sc-substatus sc-win32-status sc-bytes cs-bytes time-taken");
+        for (int i = 0; i < recordCount; i++) {
+            writer.WriteLine(line);
+        }
+
+        return path;
+    }
 }

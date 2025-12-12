@@ -50,8 +50,9 @@ public class ParserEngine : IDisposable {
 
     /// <summary>
     /// Gets or sets the maximum number of records to read before stopping.
+    /// The default value (<see cref="int.MaxValue"/>) means no limit is applied.
     /// </summary>
-    public int MaxFileRecord2Read { get; set; } = 1000000;
+    public int MaxFileRecord2Read { get; set; } = int.MaxValue;
 
     /// <summary>
     /// Gets the number of records processed so far.
@@ -84,10 +85,20 @@ public class ParserEngine : IDisposable {
 
     private IEnumerable<T> QuickProcess<T>(Func<T> factory) {
         MissingRecords = false;
-        foreach (var line in Utils.ReadAllLines(FilePath)) {
-            var obj = ProcessLine(line, factory);
-            if (obj != null)
+        var lines = Utils.ReadAllLines(FilePath);
+        var maxRecords = MaxFileRecord2Read <= 0 ? int.MaxValue : MaxFileRecord2Read;
+
+        for (var i = 0; i < lines.Count; i++) {
+            var obj = ProcessLine(lines[i], factory);
+            if (obj != null) {
+                if (CurrentFileRecord % maxRecords == 0 && i < lines.Count - 1) {
+                    MissingRecords = true;
+                    yield return obj;
+                    yield break;
+                }
+
                 yield return obj;
+            }
         }
     }
 
@@ -95,10 +106,11 @@ public class ParserEngine : IDisposable {
         MissingRecords = false;
         using var fileStream = File.Open(FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var reader = new StreamReader(fileStream);
+        var maxRecords = MaxFileRecord2Read <= 0 ? int.MaxValue : MaxFileRecord2Read;
         while (reader.Peek() > -1) {
             var obj = ProcessLine(reader.ReadLine() ?? string.Empty, factory);
             if (obj != null) {
-                if (CurrentFileRecord % MaxFileRecord2Read == 0 && reader.Peek() > -1) {
+                if (CurrentFileRecord % maxRecords == 0 && reader.Peek() > -1) {
                     MissingRecords = true;
                     yield return obj;
                     yield break;
