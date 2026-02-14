@@ -7,7 +7,7 @@ This project is inspired by the discontinued [IISLogParser](https://github.com/K
 📦 PowerShell Module
 
 [![powershell gallery version](https://img.shields.io/powershellgallery/v/IISParser.svg)](https://www.powershellgallery.com/packages/IISParser)
-[![powershell gallery preview](https://img.shields.io/powershellgallery/vpre/IISParser.svg?label=powershell%20gallery%20preview&colorB=yellow)](https://www.powershellgallery.com/packages/IISParser)
+[![powershell gallery preview](https://img.shields.io/powershellgallery/v/IISParser.svg?label=powershell%20gallery%20preview&colorB=yellow&include_prereleases)](https://www.powershellgallery.com/packages/IISParser)
 [![powershell gallery platforms](https://img.shields.io/powershellgallery/p/IISParser.svg)](https://www.powershellgallery.com/packages/IISParser)
 [![powershell gallery downloads](https://img.shields.io/powershellgallery/dt/IISParser.svg)](https://www.powershellgallery.com/packages/IISParser)
 
