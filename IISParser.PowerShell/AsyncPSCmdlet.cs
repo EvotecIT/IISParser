@@ -307,6 +307,18 @@ public abstract class AsyncPSCmdlet : PSCmdlet, IDisposable
     private bool IsPipelineThread
         => _pipelineThreadId != 0 && Environment.CurrentManagedThreadId == _pipelineThreadId;
 
+    private static void GetBlockTaskResult(Task blockTask)
+    {
+        try
+        {
+            blockTask.GetAwaiter().GetResult();
+        }
+        catch (OperationCanceledException)
+        {
+            throw new PipelineStoppedException();
+        }
+    }
+
     private void RunBlockInAsync(Func<Task> task)
     {
         using var outPipe = new BlockingCollection<PipelineItem>();
@@ -410,7 +422,7 @@ public abstract class AsyncPSCmdlet : PSCmdlet, IDisposable
                 ClearPipes();
             }
 
-            blockTask.GetAwaiter().GetResult();
+            GetBlockTaskResult(blockTask);
             return;
         }
 
@@ -427,7 +439,7 @@ public abstract class AsyncPSCmdlet : PSCmdlet, IDisposable
                 PumpItem(item);
             }
         }
-        catch
+        catch (Exception pipelineException)
         {
             _cancelSource.Cancel();
             CompleteAddingIfNeeded(outPipe);
@@ -435,13 +447,17 @@ public abstract class AsyncPSCmdlet : PSCmdlet, IDisposable
             {
                 blockTask.GetAwaiter().GetResult();
             }
-            catch (Exception ex) when (ex is OperationCanceledException or PipelineStoppedException)
+            catch (Exception completionException) when (completionException is OperationCanceledException or PipelineStoppedException)
             {
+                _ = completionException;
             }
+
+            if (pipelineException is OperationCanceledException)
+                throw new PipelineStoppedException();
 
             throw;
         }
 
-        blockTask.GetAwaiter().GetResult();
+        GetBlockTaskResult(blockTask);
     }
 }
