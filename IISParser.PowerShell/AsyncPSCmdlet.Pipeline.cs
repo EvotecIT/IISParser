@@ -176,7 +176,11 @@ public abstract partial class AsyncPSCmdlet
 
         try
         {
-            return replyPipe.Take(CancelToken).Value;
+            var reply = replyPipe.Take(CancelToken);
+            if (reply.Rejection is not null)
+                throw reply.Rejection;
+
+            return reply.Value;
         }
         finally
         {
@@ -186,6 +190,7 @@ public abstract partial class AsyncPSCmdlet
 
     private bool TryQueue(PipelineItem item)
     {
+        item.BindToHook(_hookGeneration.Value);
         var outPipe = Volatile.Read(ref _currentOutPipe);
         if (outPipe is null)
             return false;
@@ -234,16 +239,18 @@ public abstract partial class AsyncPSCmdlet
         {
             Volatile.Write(ref _pumpQueuedItems, null);
             _ = Interlocked.CompareExchange(ref _currentOutPipe, null, outPipe);
-            _ = Interlocked.CompareExchange(ref _activeHookGeneration, 0, hookGeneration);
             CompleteAddingIfNeeded(outPipe);
         }
+
+        void DeactivateHook()
+            => _ = Interlocked.CompareExchange(ref _activeHookGeneration, 0, hookGeneration);
 
         void DisposePipeOnce()
         {
             if (Interlocked.Exchange(ref pipeDisposed, 1) == 0)
             {
                 while (outPipe.TryTake(out var abandonedItem))
-                    abandonedItem.ReplyPipe?.ReleasePipeline();
+                    abandonedItem.ReplyPipe?.Reject();
                 outPipe.Dispose();
             }
         }
@@ -263,10 +270,10 @@ public abstract partial class AsyncPSCmdlet
 
         void PumpItem(PipelineItem item)
         {
-            if (item.ReplyPipe is not null &&
+            if (Volatile.Read(ref _asyncLifecycleStarted) != 0 &&
                 item.HookGeneration != Volatile.Read(ref _activeHookGeneration))
             {
-                item.ReplyPipe.ReleasePipeline();
+                item.ReplyPipe?.Reject();
                 return;
             }
 
@@ -439,6 +446,7 @@ public abstract partial class AsyncPSCmdlet
             finally
             {
                 ClearPipes();
+                DeactivateHook();
                 DisposePipeOnce();
             }
 
@@ -466,6 +474,7 @@ public abstract partial class AsyncPSCmdlet
             finally
             {
                 ClearPipes();
+                DeactivateHook();
                 DisposePipeOnce();
             }
 
@@ -518,6 +527,7 @@ public abstract partial class AsyncPSCmdlet
             CompleteAddingIfNeeded(outPipe);
             if (blockTask.IsCompleted)
                 DisposePipeOnce();
+            DeactivateHook();
 
             if (pipelineException is OperationCanceledException && stopRequested)
                 throw new PipelineStoppedException();
@@ -531,6 +541,7 @@ public abstract partial class AsyncPSCmdlet
         }
         finally
         {
+            DeactivateHook();
             DisposePipeOnce();
         }
     }
