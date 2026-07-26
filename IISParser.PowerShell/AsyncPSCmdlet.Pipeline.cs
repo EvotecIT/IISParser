@@ -22,8 +22,18 @@ public abstract partial class AsyncPSCmdlet
         if (Volatile.Read(ref _currentOutPipe) is null)
             return;
 
-        _ = TryQueue(new PipelineItem(progressRecord, PipelineType.Progress));
+        _ = TryQueue(new PipelineItem(SnapshotProgressRecord(progressRecord), PipelineType.Progress));
     }
+
+    private static ProgressRecord SnapshotProgressRecord(ProgressRecord progressRecord)
+        => new(progressRecord.ActivityId, progressRecord.Activity, progressRecord.StatusDescription)
+        {
+            CurrentOperation = progressRecord.CurrentOperation,
+            ParentActivityId = progressRecord.ParentActivityId,
+            PercentComplete = progressRecord.PercentComplete,
+            RecordType = progressRecord.RecordType,
+            SecondsRemaining = progressRecord.SecondsRemaining
+        };
 
     /// <summary>Retrieves the effective error action preference for the current invocation.</summary>
     protected ActionPreference GetErrorActionPreference()
@@ -121,7 +131,8 @@ public abstract partial class AsyncPSCmdlet
 
     private bool IsConstructionThreadOutsideAsyncHook
         => Volatile.Read(ref _currentOutPipe) is null &&
-           Environment.CurrentManagedThreadId == _constructionThreadId;
+           Environment.CurrentManagedThreadId == _constructionThreadId &&
+           CommandRuntime is not null;
 
     private bool CanAccessPipelineDirectly
         => IsPipelineThread || IsConstructionThreadOutsideAsyncHook;
@@ -267,7 +278,7 @@ public abstract partial class AsyncPSCmdlet
 
     private void RunBlockInAsyncCore(Func<Task> task)
     {
-        var outPipe = new BlockingCollection<PipelineItem>();
+        var outPipe = new BlockingCollection<PipelineItem>(boundedCapacity: 1024);
         Task blockTask;
         var deferPipeDisposal = 0;
         var pipeDisposed = 0;
@@ -586,11 +597,21 @@ public abstract partial class AsyncPSCmdlet
         {
             var stopRequested = _cancelSource.IsCancellationRequested;
             Volatile.Write(ref deferPipeDisposal, 1);
-            CancelSource();
-            CompleteAddingIfNeeded(outPipe);
-            if (blockTask.IsCompleted)
-                DisposePipeOnce();
-            DeactivateHook();
+            try
+            {
+                CancelSource();
+            }
+            catch (AggregateException)
+            {
+                // Preserve the pipeline failure while cancellation callbacks observe the same stop.
+            }
+            finally
+            {
+                CompleteAddingIfNeeded(outPipe);
+                if (blockTask.IsCompleted)
+                    DisposePipeOnce();
+                DeactivateHook();
+            }
 
             if (pipelineException is OperationCanceledException && stopRequested)
                 throw new PipelineStoppedException();
