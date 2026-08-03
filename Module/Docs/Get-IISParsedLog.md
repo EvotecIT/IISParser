@@ -11,17 +11,17 @@ Parses entries from an IIS log file.
 ## SYNTAX
 ### Default (Default)
 ```powershell
-Get-IISParsedLog -FilePath <string> [-Expand] [-Legacy] [-MaxRecords <int>] [<CommonParameters>]
+Get-IISParsedLog -FilePath <string> [-Expand] [-Legacy] [-MaxRecords <Int32>] [<CommonParameters>]
 ```
 
 ### FirstLastSkip
 ```powershell
-Get-IISParsedLog -FilePath <string> [-First <int>] [-Last <int>] [-Skip <int>] [-Expand] [-Legacy] [-MaxRecords <int>] [<CommonParameters>]
+Get-IISParsedLog -FilePath <string> [-First <Int32>] [-Last <Int32>] [-Skip <Int32>] [-Expand] [-Legacy] [-MaxRecords <Int32>] [<CommonParameters>]
 ```
 
 ### SkipLast
 ```powershell
-Get-IISParsedLog -FilePath <string> [-SkipLast <int>] [-Expand] [-Legacy] [-MaxRecords <int>] [<CommonParameters>]
+Get-IISParsedLog -FilePath <string> [-SkipLast <Int32>] [-Expand] [-Legacy] [-MaxRecords <Int32>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -108,7 +108,7 @@ Accept wildcard characters: False
 Selects the first number of log entries to return.
 
 ```yaml
-Type: Nullable`1
+Type: Int32
 Parameter Sets: FirstLastSkip
 Aliases: None
 Possible values:
@@ -124,7 +124,7 @@ Accept wildcard characters: False
 Returns only the last number of log entries.
 
 ```yaml
-Type: Nullable`1
+Type: Int32
 Parameter Sets: FirstLastSkip
 Aliases: None
 Possible values:
@@ -157,7 +157,7 @@ Maximum number of records to read from the log file.
 The default (null) reads the entire file.
 
 ```yaml
-Type: Nullable`1
+Type: Int32
 Parameter Sets: Default, FirstLastSkip, SkipLast
 Aliases: None
 Possible values:
@@ -173,7 +173,7 @@ Accept wildcard characters: False
 Skips a specified number of entries from the start.
 
 ```yaml
-Type: Nullable`1
+Type: Int32
 Parameter Sets: FirstLastSkip
 Aliases: None
 Possible values:
@@ -189,7 +189,7 @@ Accept wildcard characters: False
 Omits a specified number of entries from the end.
 
 ```yaml
-Type: Nullable`1
+Type: Int32
 Parameter Sets: SkipLast
 Aliases: None
 Possible values:
