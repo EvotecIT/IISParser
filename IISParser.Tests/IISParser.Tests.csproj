@@ -18,7 +18,7 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
         <PackageReference Include="xunit" Version="2.9.3" />
         <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0" />
-        <PackageReference Include="coverlet.collector" Version="10.0.1" />
+        <PackageReference Include="coverlet.collector" Version="10.1.0" />
         <None Update="TestData/sample.log" CopyToOutputDirectory="PreserveNewest" />
         <None Update="TestData/large_values.log" CopyToOutputDirectory="PreserveNewest" />
         <None Update="TestData/short_line.log" CopyToOutputDirectory="PreserveNewest" />
